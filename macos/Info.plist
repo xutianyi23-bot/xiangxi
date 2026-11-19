@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>ChemistWorkspace</string>
+<key>CFBundleIdentifier</key><string>studio.xiangxi.beta</string>
+<key>CFBundleName</key><string>相析</string>
+<key>NSHumanReadableCopyright</key><string>© 2026 徐天翼（笔名：鸡腿堡）。GNU GPL 第 3 版（GPL-3.0-only）。</string>
+<key>CFBundleIconFile</key><string>Workspace</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleVersion</key><string>1000</string>
+<key>CFBundleShortVersionString</key><string>1.0.0</string>
+<key>LSMinimumSystemVersion</key><string>13.0</string>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSMicrophoneUsageDescription</key><string>实时转写组会、日程、课题指令及试剂信息。</string>
+<key>NSSpeechRecognitionUsageDescription</key><string>将导师交流、试剂录音和口述内容转为可编辑文字。</string>
+</dict></plist>
