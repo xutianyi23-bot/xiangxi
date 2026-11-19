@@ -1,0 +1,33 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const web=path.join(__dirname,'..','web'),sent=[];
+const element={addEventListener(){},querySelector(){return {scrollTop:0}},style:{},innerHTML:''};
+const context=vm.createContext({assert,console,crypto,AbortController,TextEncoder,queueMicrotask,setTimeout,clearTimeout,setInterval(){},document:{querySelector:()=>element},window:{addEventListener(){},webkit:{messageHandlers:{workspace:{postMessage:m=>sent.push(m)}}}},sent});
+for(const [,file] of fs.readFileSync(path.join(web,'index.html'),'utf8').matchAll(/<script src="([^"]+)"/g))vm.runInContext(fs.readFileSync(path.join(web,file),'utf8'),context,{filename:file});
+vm.runInContext(`(async()=>{
+ window.receiveNative('load',null);
+ assert.deepEqual(db.projects,[]);assert.deepEqual(db.tasks,[]);assert.deepEqual(db.providers,[]);
+ assert.equal(db.current,'');assert.equal(db.mailAccounts?.length||0,0);
+ assert.ok(publishers().every(p=>!p.sessionTime&&!p.sessionStatus));
+ assert.ok(app.innerHTML.includes('还没有课题'));
+ assert.ok(!sent.some(m=>['batchCatalog','modelList','mailFetch','paperAccess'].includes(m.op)));
+ window.receiveNative('load',seed());
+ const state={name:'Temporary project',session:'test',ai:{},items:[],files:[{id:'doc',title:'record',path:'folder/record.md'}]};
+ let requests=0;askBatch=async()=>('长期资料'.repeat(2500));flowAI=async(kind,ai,payload)=>{
+  assert.equal(kind,'workspaceImport');requests++;assert.ok(contextBytes(payload.material)<=5400);
+  return {records:[{title:'Batch A',system:'System A',area:'experiment',note:'Description '+payload.part,fields:{observation:'Observed',result:'Pending review'}}]};
+ };
+ await classifyWorkspace(state);
+ assert.equal(requests,6);assert.equal(state.items.length,1);assert.ok(state.items[0].note.includes('Description 6'));
+ const {p}=buildImportedProject(state,state.items,{doc:'source.md'});db.projects.push(p);db.current=p.id;
+ const s=p.systems[0],b=s.experiments[0];b.start='2026-11-02T10:00';b.end='2026-11-03T10:00';
+ assert.equal(s.references[0].file,'source.md');assert.equal(b.results[0].pendingReview,true);
+ let rows=projectExportItems(p);assert.equal(rows.filter(x=>x.area==='lab'&&x.id===b.id).length,3);
+ assert.ok(rows.some(x=>x.area==='calendar'&&x.id===b.id&&x.text.includes(b.end)));
+ const log=rows.find(x=>x.title.includes('实验记录'));await writeProjectExport(p,[log],'pdf');
+ const pdf=sent.at(-1);assert.equal(pdf.format,'pdf');assert.ok(pdf.paragraphs.some(v=>v.runs.some(r=>r.text.includes('Observed'))));assert.ok(!JSON.stringify(pdf).includes('Pending review'));
+ const article={id:'draft',title:'Footnoted article',lang:'英文',authors:[],abstract:'Summary',keywords:[],figures:[],refs:[{id:'one',entry:'Verified reference.'}],marker:'footnote',sections:[{heading:'Results',paragraphs:[[{text:'Measured result.',refs:[{id:'one'}]}]]}]};
+ s.paperTargets=[{name:'Journal A',drafts:[article],corpus:[]}];rows=projectExportItems(p);
+ const paper=rows.find(x=>x.manuscript);await writeProjectExport(p,[paper,paper],'docx');
+ const doc=sent.at(-1);assert.equal(doc.notes.length,2);assert.equal(doc.paragraphs.flatMap(v=>v.runs||[]).filter(r=>r.footnote).at(-1).footnote,2);
+ console.log('导入分片归属、原件关联、逐项导出和跨稿件脚注编号通过。');
+})()`,context).catch(error=>{console.error(error);process.exitCode=1});

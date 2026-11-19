@@ -1,0 +1,24 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'..','web');
+const el={innerHTML:'',style:{},addEventListener(){},querySelector(){return {scrollTop:0}}};
+const mailPageFixture=JSON.parse(require("node:child_process").execFileSync("python3",["-B",path.join(__dirname,"mail_fixture.py")],{encoding:"utf8"}));
+const ctx=vm.createContext({mailPageFixture,assert,crypto,console,TextEncoder,setInterval(){},setTimeout,clearTimeout,queueMicrotask,document:{querySelector:()=>el},window:{addEventListener(){},webkit:{messageHandlers:{workspace:{postMessage(){}}}}}});
+for(const [,file] of fs.readFileSync(path.join(root,'index.html'),'utf8').matchAll(/<script src="([^"]+)"/g))vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx);
+vm.runInContext(`(async()=>{
+window.receiveNative('load',seed());const p=proj(),s=p.systems[0];filter=s.id;const t=newPaperTarget('期刊');const other=newPaperTarget('另一份投稿');s.paperTargets=[other,t];s.currentTarget=t.id;
+db.providers=[{id:'mock',name:'mock',models:['m']}];for(const use of ['mail','manuscript'])db.aiChoices[use]={provider:'mock',model:'m'};
+const quote='Please add a comparison.',fixture=mailPageFixture.items[0];
+db.mailConfig={host:'imap.example.test',port:'993',user:'lab@example.test',auto:true,times:[]};
+askBatch=async(op,input)=>{assert.equal(op,'mailFetch');return mailPageFixture};
+flowAI=async()=>({summary:'需补对照',items:[{kind:'experiment',quote,title:'补实验',text:'请审核实验安排'},{kind:'revision',quote,title:'改稿',text:'补充讨论'},{kind:'progress',quote,title:'返修',text:'已收到意见'},{kind:'calendar',quote,title:'截止',date:'2026-12-30',text:'提交修改稿'}]});
+await fetchMail();await fetchMail();assert.equal(mailRecords().length,1);const m=mailRecords()[0];assert.equal(m.items.length,4);assert.equal(db.mailConfig.cursor,42);assert.equal(t.reviews,undefined);const n=batches(s).length;let dest;
+form=(_,__,commit)=>commit(dest);
+dest={dest:t.id};mailAction('mailAssign',m.id);mailAction('mailAssign',m.id);assert.equal(t.reviews.length,1);assert.equal(other.reviews,undefined);manuscriptClick('paperTab','revise');assert.ok(paperPanel(s).includes('The remaining text is original.'));assert.equal(t.reviews[0].original,m.body);assert.equal(t.reviews[0].items.length,1);
+dest={dest:s.id,title:'补实验',text:'经核对',date:''};mailDestination(m,m.items[0]);mailDestination(m,m.items[0]);assert.equal(batches(s).length,n+1);
+mailDestination(m,m.items[2]);assert.ok(mailProgress(p).includes('经核对'));
+dest={...dest,date:'2026-12-30'};mailDestination(m,m.items[3]);assert.ok(events().some(e=>e.mailId===m.id&&e.date==='2026-12-30'));
+const original={id:'v1',lang:'英文',refs:[],sections:[{heading:'Discussion',paragraphs:[[{text:'Initial text',refs:[]}]]}]};t.drafts=[original];t.activeDraft=original.id;
+const item=t.reviews[0].items[0];flowAI=async()=>({paragraphs:[[{text:'Updated text',refs:[]}]]});dest={paragraph:'0-0'};manuscriptClick('reviewPropose',item.id);
+while(flowJobs.size)await new Promise(r=>setTimeout(r,1));assert.equal(item.proposal.before,'Initial text');manuscriptClick('reviewAccept',item.id);assert.equal(t.drafts.length,2);assert.equal(original.sections[0].paragraphs[0][0].text,'Initial text');assert.equal(t.drafts[1].sections[0].paragraphs[0][0].text,'Updated text');reviewClick('reviewAccept',item.id,s,t);assert.equal(t.drafts.length,2);
+assert.equal(other.drafts.length,0);assert.equal(t.reviews[0].original,fixture.body);console.log('模拟收件、重复读取、投稿隔离、邮件原文归档、补实验防重复、进度、截止日期和逐条改稿审核通过。');
+})()`,ctx).catch(e=>{console.error(e);process.exitCode=1});
