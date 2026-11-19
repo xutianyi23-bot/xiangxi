@@ -1,0 +1,27 @@
+相析 1.0.0 · Windows x64 内测预览（论文访问修订，文件版本 1.0.0.3）
+作者　徐天翼（笔名：鸡腿堡）
+代码许可　GNU GPL 第 3 版（GPL-3.0-only），详见 LICENSE.md。
+
+启动
+完整解压 ZIP，双击「相析.exe」。请将 web 文件夹、prompts.json 和程序放在一起。
+本版面向装有 .NET Framework 4.8 和 Microsoft Edge WebView2 Evergreen Runtime 的 Windows 10 / 11 x64 电脑。
+首次打开时，程序通过 HTTPS 从微软 NuGet 下载指定版本的 WebView2 连接组件，之后使用本机缓存。首次启动需要网络能访问 api.nuget.org。
+如果提示缺少浏览器运行时，请安装微软的 x64 Evergreen Runtime 并重新打开相析。
+微软运行时下载页　https://developer.microsoft.com/microsoft-edge/webview2/
+
+可以先试
+创建课题、体系、日程和实验批次，关闭后重新打开，检查记录是否保留。
+在模型页添加自己的服务商，自行设置密钥并获取模型。支持 Chat Completions、Responses 和 Anthropic Messages。使用本机 Codex 需要已在 Windows 登录 CLI，若未自动找到，请用「定位 Codex」选择实际的 codex.exe。
+可导入参考资料、检测数据与试剂照片。选好支持视觉的模型后可以读取 JPEG、PNG、BMP、TIFF 标签，核对后归档。CSV、TSV 等文本型检测文件可解析。PDF 可作为附件保存、打开，目前可直接供 AI 阅读的参考全文格式为 TXT、Markdown。
+「备份」可以把工作区和引用的附件打包至桌面或可移动盘。
+
+论文提供商和 VPN
+「VPN → 刷新系统 VPN」读取当前用户和所有用户的 Windows VPN。也可以添加学校 WebVPN 门户，或为论文窗口指定 HTTP / SOCKS5 代理。通过「接入 Clash 客户端」可测试本机端口，再到论文提供商的「访问网络」绑定该连接。使用未连接的系统 VPN 时会打开 Windows 拨号窗口，由 Windows 完成认证。
+在「论文提供商」选择知网、ScienceDirect 等平台，打开登录窗口，按学校的流程认证，再核验状态。各提供商按网络分别保存浏览器会话。网站没有明确显示登录状态时会报告待核验。论文窗口支持 PDF 下载归档和手动导入已下载的 PDF。批量检索需要本人有效的数据库访问权限。验证码和学校登录由本人在窗口内完成。
+
+此版范围
+科研邮件、麦克风转写、本地 OCR、批量课题导入、Word / PPT 导出和模板预览等功能仍待移植。部分沿用的界面说明来自 Mac 版。真机验收前请优先用一份测试课题体验。
+
+数据位置
+记录与附件保存在 %LOCALAPPDATA%\Xiangxi-Beta。解压新版本到其他文件夹后，同一 Windows 用户会继续使用这个工作区。
+API 密钥按 Windows 用户和服务商地址加密保存。备份只包含课题记录和引用的附件。Windows 初次使用时需要自行配置账号和密钥。
